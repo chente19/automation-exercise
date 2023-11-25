@@ -16,26 +16,44 @@ async function scrapFunction() {
   await page.click(
     'a.board-menu-header-close-button[title="Cerrar el menú del tablero."]'
   );
+  /* 
+    <ol id= board
+      <li X child ## Contenidos en ARRAY 
+        <ol data-testid="list-cards"   
+          <li * n --> data-list-id="55d39827b8629b45cb9c722c"
+            <a
 
-  const testList = await page.evaluate(() => {
-    const myMainList = document.querySelector(
-      'li[data-list-id="55d39827b8629b45cb9c722c"]'
-    );
-    const myHeaderH2 = myMainList.querySelector('h2[data-testid="list-name"]');
-    const cleanHeader = myHeaderH2.innerText;
+  */
 
-    const allItemMainList = myMainList.querySelectorAll("ol > li");
-    const taskList = [];
+  const jsonDataList = await page.evaluate(() => {
+    const listOfList = document.querySelectorAll('ol[id="board"] > li');
+    const objDataList = [];
 
-    allItemMainList.forEach((element) => {
-      const simpleSpan = element.querySelector("a");
-      const contentSpan = simpleSpan.innerText;
-      taskList.push(contentSpan);
+    listOfList.forEach((childli) => {
+      const taskList = [];
+      const myHeaderH2 = childli.querySelector('h2[data-testid="list-name"]');
+      const cleanHeader = myHeaderH2.innerText;
+
+      const lastLiChildArray = childli.querySelectorAll(
+        'ol[data-testid="list-cards"] > li'
+      );
+
+      lastLiChildArray.forEach((element) => {
+        const someAnchor = element.querySelector("a");
+        const contentAnchor = someAnchor.innerText;
+        taskList.push(contentAnchor);
+      });
+      
+      objFullList = {
+        headerList: cleanHeader,
+        taskNames: taskList,
+      };
+      objDataList.push(objFullList);
     });
-    return taskList;
+    return objDataList;
   });
 
-  console.log(testList);
+  console.log(jsonDataList);
 
   await new Promise((r) => setTimeout(r, 2000));
   await browser.close();
