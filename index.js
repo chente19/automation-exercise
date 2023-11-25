@@ -2,11 +2,14 @@ import express from "express";
 import puppeteer from "puppeteer";
 
 const domain = "https://trello.com/b/QvHVksDa/personal-work-goals";
+const todoistDomain = "https://app.todoist.com/auth/login";
+const userTodoist = process.env.TODOIST_EMAIL_USER;
+const passwordTodoist = process.env.TODOIST_PASSWORD_USER;
 
 async function scrapFunction() {
   const browser = await puppeteer.launch({
     headless: false,
-    slowMo: 100,
+    slowMo: 200,
   });
   const page = await browser.newPage();
 
@@ -16,16 +19,8 @@ async function scrapFunction() {
   await page.click(
     'a.board-menu-header-close-button[title="Cerrar el menú del tablero."]'
   );
-  /* 
-    <ol id= board
-      <li X child ## Contenidos en ARRAY 
-        <ol data-testid="list-cards"   
-          <li * n --> data-list-id="55d39827b8629b45cb9c722c"
-            <a
 
-  */
-
-  const jsonDataList = await page.evaluate(() => {
+  const trelloJsonArray = await page.evaluate(() => {
     const listOfList = document.querySelectorAll('ol[id="board"] > li');
     const objDataList = [];
 
@@ -43,7 +38,7 @@ async function scrapFunction() {
         const contentAnchor = someAnchor.innerText;
         taskList.push(contentAnchor);
       });
-      
+
       objFullList = {
         headerList: cleanHeader,
         taskNames: taskList,
@@ -53,13 +48,29 @@ async function scrapFunction() {
     return objDataList;
   });
 
-  console.log(jsonDataList);
+  await new Promise((r) => setTimeout(r, 2000));
+  await browser.close();
+  return trelloJsonArray;
+}
 
+async function sendTodoist(jsonTodoist) {
+  console.log(jsonTodoist);
+  const browser = await puppeteer.launch({
+    headless: false,
+    slowMo: 200,
+  });
+  const page = await browser.newPage();
+  await page.goto(todoistDomain);
+
+  await page.waitForSelector("#element-0");
+  await page.type("#element-0", userTodoist);
   await new Promise((r) => setTimeout(r, 2000));
   await browser.close();
 }
 
-scrapFunction();
+scrapFunction().then((jsonTodoist) => {
+  sendTodoist(jsonTodoist);
+});
 
 /* const app = express();
 
