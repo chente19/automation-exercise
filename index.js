@@ -64,13 +64,20 @@ async function sendTodoist(jsonTodoist) {
 
   await page.waitForSelector("#element-0");
   await page.type("#element-0", userTodoist);
+  await page.waitForSelector("#element-3");
+  await page.type("#element-3", passwordTodoist);
+  await page.click('button[data-gtm-id="start-email-login"]');
+  await page.waitForSelector('button[aria-label="Añadir un proyecto"]');
+  await page.click('button[aria-label="Añadir un proyecto"]');
   await new Promise((r) => setTimeout(r, 2000));
   await browser.close();
 }
 
-scrapFunction().then((jsonTodoist) => {
+/* scrapFunction().then((jsonTodoist) => {
   sendTodoist(jsonTodoist);
-});
+}); */
+
+sendTodoist("probando todoist");
 
 /* const app = express();
 
