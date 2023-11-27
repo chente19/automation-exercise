@@ -1,4 +1,3 @@
-import express from "express";
 import puppeteer from "puppeteer";
 
 const domain = "https://trello.com/b/QvHVksDa/personal-work-goals";
@@ -84,13 +83,6 @@ async function fillCaseZeroList(page, taskAddSelector, taskName) {
   await page.click('button[data-testid="task-editor-submit-button"]');
 }
 
-async function fillCaseTwoZeroList(page, taskName) {
-  await page.waitForSelector('p[data-placeholder="Nombre de la tarea"]');
-  await page.type('p[data-placeholder="Nombre de la tarea"]', taskName);
-  await page.waitForSelector('button[data-testid="task-editor-submit-button"]');
-  await page.click('button[data-testid="task-editor-submit-button"]');
-}
-
 async function fillTodoistList(page, element, indexList) {
   let headerName = element.headerList;
   let onlyTaskArray = element.taskNames;
@@ -116,22 +108,11 @@ async function fillTodoistList(page, element, indexList) {
     console.log(headerName);
     console.log(taskAddSelector);
     console.log(taskName);
-
-    if (indexList == 0 && indexTask < 2) {
-      await fillCaseZeroList(page, taskAddSelector, taskName);
-    } else if (indexList == 0) {
-      await fillCaseTwoZeroList(page, taskName);
-    } else if (indexList > 0 && indexTask == 0) {
-      await fillCaseZeroList(page, taskAddSelector, taskName);
-    } else if (indexList > 0 && indexTask > 0) {
-      fillCaseTwoZeroList(page, taskName);
-    }
+    await fillCaseZeroList(page, taskAddSelector, taskName);
+    await page.keyboard.press("Escape");
   }
-
-  await page.waitForSelector('button[aria-label="Cancelar"]');
-  await page.click('button[aria-label="Cancelar"]');
   console.log("-----------------------------");
-  console.log("Siguiente lista please !!!!!!");
+  console.log("Try next list !!!!!!");
 }
 
 async function sendTodoist(jsonTodoist) {
@@ -156,94 +137,15 @@ async function sendTodoist(jsonTodoist) {
   await page.waitForSelector('button[type="submit"]');
   await page.click('button[type="submit"]');
   // Here fill all lists
-  /* jsonTodoist.forEach(async (element, indexList) => {
-    await fillTodoistList(page, element, indexList);
-  }); */
   for (const [index, element] of jsonTodoist.entries()) {
     await fillTodoistList(page, element, index);
   }
 
   await new Promise((r) => setTimeout(r, 2000));
   await browser.close();
+  console.log("Automation DONE !! :)");
 }
-/* 
+
 scrapFunction().then((jsonTodoist) => {
   sendTodoist(jsonTodoist);
 });
- */
-const dataTest = [
-  {
-    headerList: "Personal",
-    taskNames: [
-      "Cook new recipes on the weekend",
-      "Research freelance possibilites",
-      "Land first freelance job",
-      "Compile list of favorite photos for photo book gift at Christmas",
-    ],
-  },
-  {
-    headerList: "Work",
-    taskNames: [
-      "Complete software update 4.1 before September",
-      "Add additional functionality to database loading applications",
-      "Ask to be assigned to a major project",
-    ],
-  },
-  {
-    headerList: "School",
-    taskNames: [
-      "Complete courses required for the focus of my degree",
-      "Complete University Degree by 2021",
-    ],
-  },
-  {
-    headerList: "Social",
-    taskNames: [
-      "One date night a month.",
-      `Continue to host "movie night" on Sunday's with friends`,
-    ],
-  },
-  {
-    headerList: "Blog",
-    taskNames: [
-      "Write two posts per week.",
-      "Write article about Trello and how to setup life goals board",
-      "Get life goals board shared on the new Trello Inspiration page",
-      "Join bloglovin'",
-    ],
-  },
-  {
-    headerList: "Health",
-    taskNames: [
-      "Lower blood pressure",
-      "Use MyFitnessPal without skipping days",
-      "Obtain 10,000 steps a day on average using my Fitbit",
-      "Run a 10k before the end of the year",
-      "Meditate three times a week",
-    ],
-  },
-  {
-    headerList: "Travel",
-    taskNames: ["Places to See With the Kids", "Places to See Later in Life"],
-  },
-  {
-    headerList: "Financial",
-    taskNames: [
-      "Put aside $__ per month to save for travel",
-      "Put aside $__ per month for investments",
-      "Put aside $__ per month for savings",
-    ],
-  },
-];
-
-sendTodoist(dataTest);
-
-/* const app = express();
-
-app.get("/", (req, res) => {
-  res.send("Hello world");
-});
-
-const portNumber = 4000;
-app.listen(portNumber);
-console.log(`Ìs working on port: ${portNumber}`); */
