@@ -20,11 +20,11 @@ Simple automation scraping task list from trello and send to todoist platform
 
 ## Initial Config
 
-`1.-` Create a file with file name `.env`.
-`2.-` Copy the content of `.env.example` and paste in `.env` file.
-`3.-` Type your `TODOSIST email account and password`, then save changes.
-`4.-` In the root project path open a terminal.
-`5.-` Type in terminal below command:
+1. Create a file with file name `.env`.
+2. Copy the content of `.env.example` and paste in `.env` file.
+3. Type your `TODOSIST email account and password`, then save changes.
+4. In the root project path open a terminal.
+5. Type in terminal below command:
 
 ```bash
 npm install
